@@ -78,6 +78,7 @@ const Login = () => {
       <style jsx>{`
         .login-email-input {
           display: unset;
+          margin: 0 auto 0 auto;
         }
       `}</style>
     </Layout>

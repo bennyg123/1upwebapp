@@ -21,26 +21,22 @@ const Test = ({ user }) => (
       />
 
       <h1 className="text-center">Encounter</h1>
-      {dstu2Encounter.entry.map(function(eachEncounter) {
-        return (
-          <Resources.Encounter
-            jsonOpen={true}
-            fhirResource={eachEncounter.resource}
-            thorough={false}
-          />
-        );
-      })}
+      {dstu2Encounter.entry.map(eachEncounter => (
+        <Resources.Encounter
+          jsonOpen={true}
+          fhirResource={eachEncounter.resource}
+          thorough={false}
+        />
+      ))}
 
       <h1 className="text-center">Observation</h1>
-      {dstu2Observation.entry.map(function(eachObservation) {
-        return (
-          <FhirResource
-            jsonOpen={true}
-            fhirResource={eachObservation.resource}
-            thorough={false}
-          />
-        );
-      })}
+      {dstu2Observation.entry.map(eachObservation => (
+        <FhirResource
+          jsonOpen={true}
+          fhirResource={eachObservation.resource}
+          thorough={false}
+        />
+      ))}
     </div>
   </Layout>
 );

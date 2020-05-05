@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import fetch from 'isomorphic-fetch';
 import { authenticate } from '../utils';
@@ -6,53 +6,56 @@ import Header from '../components/Header.js';
 import Layout from '../components/layouts/Layout';
 import { FhirResource } from 'fhir-react';
 
-export default class Dashboard extends React.Component {
-  static async getInitialProps({ req, res }) {
-    const user = await authenticate(req, res);
-    if (typeof req === 'undefined') {
-      let dashboard = await fetch(`http://localhost:3000/api/dashboard`, {
-        credentials: 'include',
-      }).then(r => r.json());
-      return { dashboard, user };
-    } else {
-      let authHeader = {
-        Authorization: 'Bearer ' + req.session.oneup_access_token,
-      };
-      let dashboard = await fetch(`http://localhost:3000/api/dashboard`, {
-        headers: authHeader,
-      }).then(r => r.json());
-      return { dashboard, user };
-    }
-  }
+const RESOURCE_TYPES = [
+  'Patient',
+  'Practitioner',
+  'AllergyIntolerance',
+  'MedicationOrder',
+  'MedicationStatement',
+  'Condition',
+  'Observation',
+  'FamilyMemberHistory',
+  'DiagnosticReport',
+  'Immunization',
+  'Encounter',
+  'CarePlan',
+  'Goal',
+  'Procedure',
+  'Device',
+  'DocumentReference',
+  'Binary',
+];
 
-  componentDidMount() {
-    if (this.props.user) {
+const Dashboard = ({ dashboard, user }) => {
+  useEffect(() => {
+    if (user) {
+      // If the user exists sets the user email and access token in localstorage
       try {
-        window.localStorage.setItem('email', this.props.user.email);
+        window.localStorage.setItem('email', user.email);
         window.localStorage.setItem(
           'oneup_access_token',
-          this.props.user.oneup_access_token,
+          user.oneup_access_token,
         );
-      } catch (err) {}
+      } catch (err) {
+        console.error('error setting email and access token');
+      }
     } else {
       window.localStorage.remove('email');
       window.localStorage.remove('oneup_access_token');
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  render() {
-    return (
-      <Layout>
-        <Header user={this.props.user} />
-        <div className="container">
-          <br />
-          <h1>Your medical dashboard </h1>
-          <br />
-          <div>
-            {typeof this.props.dashboard.resources.Patient !== 'undefined' &&
-            this.props.dashboard.resources.Patient.entry.length > 0 ? (
-              ''
-            ) : (
+  return (
+    <Layout>
+      <Header user={user} />
+      <div className="container">
+        <br />
+        <h1>Your medical dashboard </h1>
+        <br />
+        <div>
+          {!dashboard.resources.Patient ||
+            (dashboard.resources.Patient.entry.length === 0 && (
               <div>
                 <br />
                 <br />
@@ -63,59 +66,55 @@ export default class Dashboard extends React.Component {
                   <a href="/">Connect some health systems</a>
                 </Link>
               </div>
-            )}
-          </div>
-          <div style={{ textAlign: 'left' }}>
-            {[
-              'Patient',
-              'Practitioner',
-              'AllergyIntolerance',
-              'MedicationOrder',
-              'MedicationStatement',
-              'Condition',
-              'Observation',
-              'FamilyMemberHistory',
-              'DiagnosticReport',
-              'Immunization',
-              'Encounter',
-              'CarePlan',
-              'Goal',
-              'Procedure',
-              'Device',
-              'DocumentReference',
-              'Binary',
-            ].map(
-              function(resourceType) {
-                return (
-                  <div>
-                    {typeof this.props.dashboard.resources[resourceType] !=
-                      'undefined' &&
-                    this.props.dashboard.resources[resourceType].entry.length >
-                      0 ? (
-                      <h1>{resourceType}</h1>
-                    ) : (
-                      ''
-                    )}
-                    {typeof this.props.dashboard.resources[resourceType] !=
-                    'undefined'
-                      ? this.props.dashboard.resources[resourceType].entry.map(
-                          function(resourceContainer) {
-                            return (
-                              <FhirResource
-                                fhirResource={resourceContainer.resource}
-                              />
-                            );
-                          },
-                        )
-                      : ''}
-                    <br />
-                  </div>
-                );
-              }.bind(this),
-            )}
-          </div>
+            ))}
         </div>
-      </Layout>
-    );
-  }
-}
+        <div className="dashboard-resource-types-container">
+          {RESOURCE_TYPES.map(resourceType => (
+            <div>
+              {!!dashboard.resources[resourceType] &&
+                dashboard.resources[resourceType].entry.length > 0 && (
+                  <h1>{resourceType}</h1>
+                )}
+              {!!dashboard.resources[resourceType] &&
+                dashboard.resources[
+                  resourceType
+                ].entry.map(resourceContainer => (
+                  <FhirResource fhirResource={resourceContainer.resource} />
+                ))}
+              <br />
+            </div>
+          ))}
+        </div>
+      </div>
+      <style jsx>{`
+        .dashboard-resource-types-container {
+          text-align: left;
+        }
+      `}</style>
+    </Layout>
+  );
+};
+
+Dashboard.getInitialProps = async function({ req, res }) {
+  const user = await authenticate(req, res);
+
+  // use the access token if it exists in the request
+  let options = !!req
+    ? {
+        headers: {
+          Authorization: 'Bearer ' + req.session.oneup_access_token,
+        },
+      }
+    : {
+        credentials: 'include',
+      };
+
+  let dashboard = await fetch(
+    `http://localhost:3000/api/dashboard`,
+    options,
+  ).then(r => r.json());
+
+  return { dashboard, user };
+};
+
+export default Dashboard;
