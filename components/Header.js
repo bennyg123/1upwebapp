@@ -1,83 +1,120 @@
 // TODO fix linter warnings in the file
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import {
+  Navbar,
+  NavbarBrand,
+  NavbarToggler,
+  Collapse,
+  Nav,
+  NavItem,
+} from 'reactstrap';
 
 import { logout, logoutEvent } from '../utils';
 
-export default class Header extends React.Component {
-  componentDidMount() {
-    this.onLogout = eve => logoutEvent(eve, this.props.url);
-    window.addEventListener('storage', this.onLogout, false);
-  }
+const Header = ({ user }) => {
+  // The users email is used to authenticate and check if they are logged in.
+  const userIsDefined = !!user && !!user.email;
+  const [collapsed, setCollapsed] = useState(true);
 
-  componentWillUnmount() {
-    window.removeEventListener('storage', this.onLogout, false);
-  }
-  render() {
-    return (
-      <header>
-        <nav className="navbar navbar-expand-lg navbar-light bg-light">
-          <a className="navbar-brand" href="https://1up.health/dev">
-            1upHealth
-          </a>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-toggle="collapse"
-            data-target="#navbarNav"
-            aria-controls="navbarNav"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggsler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav">
-              {typeof this.props.user === 'undefined' ||
-              this.props.user.email === 'null' ? (
-                ''
-              ) : (
-                <li className="nav-item">
-                  <a className="nav-link">
-                    <Link href="/">Connect Data</Link>&nbsp;{' '}
-                    <span className="sr-only">(current)</span>
-                  </a>
-                </li>
-              )}
-              {typeof this.props.user === 'undefined' ||
-              this.props.user.email === 'null' ? (
-                <a className="nav-link" href="">
-                  <Link href="/login">Login</Link>
-                </a>
-              ) : (
-                <li className="nav-item">
-                  <a className="nav-link" href="">
-                    <Link href="/logout" onClick={logout}>
-                      Logout
-                    </Link>
-                  </a>
-                </li>
-              )}
-              {typeof this.props.user === 'undefined' ||
-              this.props.user.email === 'null' ? (
-                ''
-              ) : (
-                <li className="nav-item">
-                  <a className="nav-link" href="">
-                    <Link href="/dashboard">{this.props.user.email}</Link>
-                  </a>
-                </li>
-              )}
-              <li className="nav-item">
-                <a className="nav-link" href="">
-                  <Link href="/test">Test Data</Link>&nbsp;{' '}
-                </a>
-              </li>
-            </ul>
-          </div>
-        </nav>
-      </header>
-    );
-  }
-}
+  const toggleNavbar = () => setCollapsed(!collapsed);
+
+  useEffect(() => {
+    const onLogout = eve => {
+      logoutEvent(eve, user ? user.url : '/');
+    };
+
+    // adds a listener to the storage event to log the user out
+    window.addEventListener('storage', onLogout, false);
+
+    return () => {
+      window.removeEventListener('storage', onLogout, false);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const getNavBarLinks = () => {
+    // Depending on if the user is logged in or not, set the correct links in the header
+    let links = [
+      {
+        href: '/test',
+        text: 'Test Data',
+      },
+    ];
+
+    if (userIsDefined) {
+      links = [
+        {
+          href: '/',
+          text: 'Connect Data',
+          current: true,
+        },
+        {
+          href: '/logout',
+          text: 'Logout',
+          onClick: logout,
+        },
+        {
+          href: '/dashboard',
+          text: user.email,
+        },
+        ...links,
+      ];
+    } else {
+      links = [
+        {
+          href: '/login',
+          text: 'Login',
+        },
+        ...links,
+      ];
+    }
+
+    return links;
+  };
+
+  return (
+    <header>
+      <Navbar color="faded" light expand="md">
+        <NavbarBrand
+          href="https://1up.health/dev"
+          className="mr-auto navbar-logo"
+        >
+          1upHealth
+        </NavbarBrand>
+        <NavbarToggler onClick={toggleNavbar} className="mr-2" />
+        <Collapse isOpen={!collapsed} navbar>
+          <Nav navbar>
+            {getNavBarLinks().map(({ href, text, current, onClick }) => (
+              <NavItem
+                key={text}
+                onClick={onClick}
+                className="nav-item--header"
+              >
+                <>
+                  <Link href={href}>
+                    <a className="nav-link">{text}</a>
+                  </Link>
+                  {current && <span className="sr-only">(current)</span>}
+                </>
+              </NavItem>
+            ))}
+          </Nav>
+        </Collapse>
+      </Navbar>
+      <style jsx>{`
+        a.nav-link:not(:hover) {
+          color: #007bff;
+        }
+      `}</style>
+      <style global jsx>{`
+        .nav-item--header:first-of-type {
+          margin-left: 1rem;
+        }
+      `}</style>
+    </header>
+  );
+};
+
+export default Header;
