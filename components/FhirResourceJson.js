@@ -1,40 +1,32 @@
 import React from 'react';
 
-export default class FhirResourceJson extends React.Component {
-  render() {
-    let componentType;
-    if (this.props.fhirResource.resource.resourceType === 'Patient') {
-      componentType = (
-        <Patient patientProps={this.props.fhirResource.resource.resourceType} />
-      );
-    } else {
-      componentType = <JsonFormater fhirResource={this.props.fhirResource} />;
-    }
-    return (
-      <div className="bg-light card mb-6">
-        <div className="card-header">
-          {this.props.fhirResource.resource.resourceType}
-        </div>
-        <div className="card-body">{componentType}</div>
-      </div>
+export const JsonFormatter = ({ fhirResource }) => (
+  <code>
+    <pre>{JSON.stringify(fhirResource, null, 2)}</pre>
+  </code>
+);
+
+export const Patient = () => (
+  <div>
+    <h1>lol</h1>
+  </div>
+);
+
+const FhirResourceJson = ({ fhirResource }) => {
+  let resourceType = fhirResource.resource.resourceType;
+  let componentType =
+    resourceType === 'Patient' ? (
+      <Patient patientProps={resourceType} />
+    ) : (
+      <JsonFormatter fhirResource={fhirResource} />
     );
-  }
-}
-class Patient extends React.Component {
-  render() {
-    return (
-      <div>
-        <h1>lol</h1>
-      </div>
-    );
-  }
-}
-class JsonFormater extends React.Component {
-  render() {
-    return (
-      <code>
-        <pre>{JSON.stringify(this.props.fhirResource, null, 2)}</pre>
-      </code>
-    );
-  }
-}
+
+  return (
+    <div className="bg-light card mb-6">
+      <div className="card-header">{resourceType}</div>
+      <div className="card-body">{componentType}</div>
+    </div>
+  );
+};
+
+export default FhirResourceJson;
