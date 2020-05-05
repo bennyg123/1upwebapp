@@ -1,100 +1,65 @@
-import React from 'react';
+import React, { useState } from 'react';
 import 'isomorphic-fetch';
 import Header from '../components/Header.js';
 import Layout from '../components/layouts/Layout';
 
-export default class Login extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      submitted: false,
-      email: '',
-    };
-  }
+const Login = () => {
+  const [submitted, setSubmitted] = useState(false);
+  const [email, setEmail] = useState('');
 
-  onSubmit = e => {
+  // On submit, set submitted to true and sends a post request to send the user an email to login
+  const onSubmit = e => {
     e.preventDefault();
-    this.setState({
-      submitted: true,
-    });
+    setSubmitted(true);
 
-    window.fetch('/sendtoken', {
+    fetch('/sendtoken', {
       method: 'POST',
-      body: JSON.stringify({ user: this.state.email }),
-      headers: new window.Headers({
+      body: JSON.stringify({ user: email }),
+      headers: new Headers({
         'Content-Type': 'application/json',
       }),
     });
   };
 
-  onEmailChange = e => {
-    this.setState({
-      email: e.target.value,
-    });
-  };
+  const onEmailChange = e => setEmail(e.target.value);
 
-  welcomeText = () => {
-    return (
+  return (
+    <Layout>
+      <Header />
       <div className="container">
-        <div className="jumbotron bg-light">
-          <h1>
-            Welcome to the <a href="https://1up.health">1upHealth</a> Demo App.
-          </h1>
-          <p>
-            You can sign in, connect your health systems, and view your medical
-            record. Learn more about the tech behind this app in the{' '}
-            <a href="https://github.com/1uphealth/1upwebapp">git repo</a>.
-          </p>
-        </div>
-      </div>
-    );
-  };
-
-  render() {
-    if (this.state.submitted) {
-      return (
-        <Layout>
-          <Header />
+        <br />
+        <br />
+        <div className="row">
           <div className="container">
-            <br />
-            <br />
-            <div className="row">
-              {this.welcomeText()}
-              <div className="container  text-center">
-                <h1>
-                  Check your email. <br />
-                  We sent a magic link to log into your account :)
-                </h1>
-              </div>
+            <div className="jumbotron bg-light">
+              <h1>
+                Welcome to the <a href="https://1up.health">1upHealth</a> Demo
+                App.
+              </h1>
+              <p>
+                You can sign in, connect your health systems, and view your
+                medical record. Learn more about the tech behind this app in the{' '}
+                <a href="https://github.com/1uphealth/1upwebapp">git repo</a>.
+              </p>
             </div>
           </div>
-          <br />
-          <br />
-          <br />
-        </Layout>
-      );
-    }
-
-    return (
-      <Layout className="cent">
-        <Header />
-        <div className="container">
-          <br />
-          <br />
-          <div className="row text-center">
-            {this.welcomeText()}
-            <div className="container">
-              <form onSubmit={this.onSubmit}>
+          <div className="container  text-center">
+            {submitted ? (
+              <h1>
+                Check your email. <br />
+                We sent a magic link to log into your account :)
+              </h1>
+            ) : (
+              <form onSubmit={onSubmit}>
                 <h3>Login using your email</h3>
                 <input
-                  onChange={this.onEmailChange}
-                  value={this.state.email}
+                  onChange={onEmailChange}
+                  value={email}
                   type="email"
-                  className="form-control col-sm-4"
+                  className="form-control col-sm-4 login-email-input"
                   required
                   placeholder="email@domain.org"
                   autoFocus
-                  style={{ display: 'unset' }}
                 />
                 <br />
                 <input
@@ -103,10 +68,20 @@ export default class Login extends React.Component {
                   value="Login"
                 />
               </form>
-            </div>
+            )}
           </div>
         </div>
-      </Layout>
-    );
-  }
-}
+      </div>
+      <br />
+      <br />
+      <br />
+      <style jsx>{`
+        .login-email-input {
+          display: unset;
+        }
+      `}</style>
+    </Layout>
+  );
+};
+
+export default Login;

@@ -1,28 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Header from '../components/Header.js';
 
-export default class Logout extends React.Component {
-  static async getInitialProps({ req }) {
-    const user = req ? req.user : null;
-    return { user };
-  }
-
-  componentDidMount() {
-    if (this.props.user) {
+const Logout = ({ user }) => {
+  useEffect(() => {
+    if (user) {
       try {
-        window.localStorage.setItem('user', this.props.user);
-      } catch (err) {}
-    } else if (typeof this.props.user !== 'undefined') {
+        window.localStorage.setItem('user', user);
+      } catch (err) {
+        console.error('unable to set email and access token');
+      }
+    } else {
       window.localStorage.removeItem('user');
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  render() {
-    return (
-      <div>
-        <Header />
-        <h1>Logged out!</h1>
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <Header />
+      <h1>Logged out!</h1>
+    </div>
+  );
+};
+
+Logout.getInitialProps = async function({ req }) {
+  const user = req ? req.user : null;
+  return { user };
+};
+
+export default Logout;
