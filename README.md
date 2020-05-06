@@ -57,6 +57,29 @@ sudo python -m smtpd -n -c DebuggingServer localhost:25
 ## Test Health Systems
 You can test the demo web app with one of these [FHIR health system accounts](https://1up.health/dev/doc/fhir-test-credentials).
 
+## Connecting a Provider
+The steps below show how to add a test user to the account, however the steps should be the same for regular patient data as well.
+
+1. After following the above steps, go to http://localhost:3000 and login
+
+![Homepage](images/homepage.png "Homepage")
+
+2. Click on "Connect Data" in the navbar up top
+
+![Empty Dashboard](images/empty-dashboard.png "Empty Dashboard")
+
+3. Search for your provider (in this example its EPIC) and click on the result.
+
+![Provider Search](images/provider-search-results.png "Provider Search Results")
+
+4. Enter your details into the provider site and authorize the application to access the data.
+
+![Login to Provider](images/epic.png "Epic Login Screen")
+
+5. You will be redirected back to the dashboard.
+
+![Patient Results](images/dashboard.png "Patient Results")
+
 ## Optional Setup: Setup email using actual email (relay) server
 Either run a test local server for development
 ```

@@ -1,4 +1,5 @@
 require('dotenv').config();
+
 const express = require('express');
 const next = require('next');
 const bodyParser = require('body-parser');
@@ -46,10 +47,10 @@ app
     // we suggest bundling your requests to the 1uphealth api on the backend
     // and presenting them to the frontend via your own api routes
     server.get('/api/dashboard', auth.authUser, (req, res) => {
-      var oneupAccessToken =
+      let oneupAccessToken =
         req.session.oneup_access_token ||
         req.headers.authorization.split(' ')[1];
-      oneup.getAllFhirResourceBundles(oneupAccessToken, function(responseData) {
+      oneup.getAllFhirResourceBundles(oneupAccessToken, responseData => {
         res.send({ token: oneupAccessToken, resources: responseData });
       });
     });
