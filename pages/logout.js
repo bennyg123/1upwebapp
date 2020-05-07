@@ -5,7 +5,7 @@ const Logout = ({ user }) => {
   useEffect(() => {
     if (user) {
       try {
-        window.localStorage.setItem('user', user);
+        window.localStorage.setItem('user', JSON.stringify(user));
       } catch (err) {
         console.error('unable to set email and access token');
       }

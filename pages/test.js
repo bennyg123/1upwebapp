@@ -21,8 +21,9 @@ const Test = ({ user }) => (
       />
 
       <h1 className="text-center">Encounter</h1>
-      {dstu2Encounter.entry.map(eachEncounter => (
+      {dstu2Encounter.entry.map((eachEncounter, i) => (
         <Resources.Encounter
+          key={`encounter${i}`}
           jsonOpen={true}
           fhirResource={eachEncounter.resource}
           thorough={false}
@@ -30,8 +31,9 @@ const Test = ({ user }) => (
       ))}
 
       <h1 className="text-center">Observation</h1>
-      {dstu2Observation.entry.map(eachObservation => (
+      {dstu2Observation.entry.map((eachObservation, i) => (
         <FhirResource
+          key={`observations${i}`}
           jsonOpen={true}
           fhirResource={eachObservation.resource}
           thorough={false}

@@ -27,6 +27,8 @@ const RESOURCE_TYPES = [
 ];
 
 const Dashboard = ({ dashboard, user }) => {
+  console.log(dashboard);
+
   useEffect(() => {
     if (user) {
       // If the user exists sets the user email and access token in localstorage
@@ -54,7 +56,8 @@ const Dashboard = ({ dashboard, user }) => {
         <h1>Your medical dashboard </h1>
         <br />
         <div>
-          {!dashboard.resources.Patient ||
+          {!dashboard || !dashboard.resources ||
+            !dashboard.resources.Patient ||
             (dashboard.resources.Patient.entry.length === 0 && (
               <div>
                 <br />
@@ -68,24 +71,27 @@ const Dashboard = ({ dashboard, user }) => {
               </div>
             ))}
         </div>
-        <div className="dashboard-resource-types-container">
-          {RESOURCE_TYPES.map(resourceType => (
-            <div>
-              {!!dashboard.resources[resourceType] &&
-                dashboard.resources[resourceType].entry.length > 0 && (
-                  <h1>{resourceType}</h1>
-                )}
-              {!!dashboard.resources[resourceType] &&
-                dashboard.resources[
-                  resourceType
-                ].entry.map(resourceContainer => (
-                  <FhirResource fhirResource={resourceContainer.resource} />
-                ))}
-              <br />
-            </div>
-          ))}
-        </div>
+        {dashboard && dashboard.resources && (
+          <div className="dashboard-resource-types-container">
+            {RESOURCE_TYPES.map(resourceType => (
+              <div>
+                {!!dashboard.resources[resourceType] &&
+                  dashboard.resources[resourceType].entry.length > 0 && (
+                    <h1>{resourceType}</h1>
+                  )}
+                {!!dashboard.resources[resourceType] &&
+                  dashboard.resources[
+                    resourceType
+                  ].entry.map(resourceContainer => (
+                    <FhirResource fhirResource={resourceContainer.resource} />
+                  ))}
+                <br />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+      <div>{JSON.stringify(dashboard)}</div>
       <style jsx>{`
         .dashboard-resource-types-container {
           text-align: left;

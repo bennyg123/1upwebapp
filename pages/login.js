@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import 'isomorphic-fetch';
 import Header from '../components/Header.js';
 import Layout from '../components/layouts/Layout';
 
 const Login = () => {
   const [submitted, setSubmitted] = useState(false);
-  const [email, setEmail] = useState('');
+  const emailRef = useRef('');
 
   // On submit, set submitted to true and sends a post request to send the user an email to login
   const onSubmit = e => {
@@ -14,14 +14,12 @@ const Login = () => {
 
     fetch('/sendtoken', {
       method: 'POST',
-      body: JSON.stringify({ user: email }),
+      body: JSON.stringify({ user: emailRef.current.value }),
       headers: new Headers({
         'Content-Type': 'application/json',
       }),
     });
   };
-
-  const onEmailChange = e => setEmail(e.target.value);
 
   return (
     <Layout>
@@ -53,8 +51,7 @@ const Login = () => {
               <form onSubmit={onSubmit}>
                 <h3>Login using your email</h3>
                 <input
-                  onChange={onEmailChange}
-                  value={email}
+                  ref={emailRef}
                   type="email"
                   className="form-control col-sm-4 login-email-input"
                   required

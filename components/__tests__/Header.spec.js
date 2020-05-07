@@ -3,10 +3,11 @@ import { render, screen } from '@testing-library/react';
 import Header from '../Header';
 import * as utils from '../../utils';
 
-const MOCK_USER = {
+export const MOCK_USER = {
   email: 'test@1up.health',
   user: 'test user',
   url: 'http://localhost:3000',
+  oneup_access_token: '12345',
 };
 
 describe('Header Component', () => {
