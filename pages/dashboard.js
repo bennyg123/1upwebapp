@@ -56,7 +56,8 @@ const Dashboard = ({ dashboard, user }) => {
         <h1>Your medical dashboard </h1>
         <br />
         <div>
-          {!dashboard || !dashboard.resources ||
+          {!dashboard ||
+            !dashboard.resources ||
             !dashboard.resources.Patient ||
             (dashboard.resources.Patient.entry.length === 0 && (
               <div>
